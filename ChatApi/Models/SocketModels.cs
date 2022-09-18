@@ -14,6 +14,14 @@ namespace ChatApi.Models
         }
     }
 
+    public class SendMessageSocketModel 
+    {
+        public Message? Message { get; set; }
+        public Guid? MessageId { get; set; }
+        public GroupMessage? GroupMessage { get; set; }
+        public Guid? GroupMessageId { get; set; }
+    }
+
     public class RoomSocketModel
     {
         public string? RoomId { get; set; }

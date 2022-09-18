@@ -26,18 +26,11 @@ namespace ChatApi.Controllers
             return Ok("healthy");
         }
 
-        [HttpGet]
-        [Route("enter/{roomId}")]
-        public async Task<IActionResult> EnterChat(RoomEnterModel model)
+        [HttpPost]
+        [Route("message")]
+        public async Task<IActionResult> SendMessage(SendMessageModel model)
         {
-            return new ResponseHelper().CreateResponse(await _service.EnterChat(model.RoomId, model.User));
-        }
-
-        [HttpGet]
-        [Route("message/{roomId}")]
-        public async Task<IActionResult> SendMessage(RoomEnterModel model)
-        {
-            return new ResponseHelper().CreateResponse(await _service.SendMessage(model.RoomId, model.User, model.Message));
+            return new ResponseHelper().CreateResponse(await _service.SendMessage(model));
         }
     }
 }

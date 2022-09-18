@@ -1,5 +1,6 @@
 ﻿using ChatApi.Data;
 using ChatApi.Entities;
+using ChatApi.Helpers;
 using ChatApi.Models;
 using ChatApi.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +17,24 @@ namespace ChatApi.Services
         {
             _db = db;
             _userManager = userManager;
+        }
+
+        public async Task<ResponseModel> GetPaginated(UserFilterModel model, string userId)
+        {
+            try
+            {
+                IQueryable<User> users = _db.Users.Where(x => x.Id != userId);
+
+                users = !String.IsNullOrEmpty(model.Name) ? users.Where(x => x.UserName.ToLower().Contains(model.Name)) : users;
+
+                UserPaginateModel result = new(await users.ToListAsync(), new Pager(users.Count(), model.Page, model.PageSize));
+
+                return new ResponseModel(200, result);
+            }
+            catch
+            {
+                return new ResponseModel(500, "Ocorreu um erro!");
+            }
         }
 
         public async Task<ResponseModel> GetByIdAsync(string id)
