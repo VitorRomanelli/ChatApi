@@ -1,5 +1,6 @@
 ﻿using ChatApi.Data;
 using ChatApi.Entities;
+using ChatApi.Extensions;
 using ChatApi.Helpers;
 using ChatApi.Models;
 using ChatApi.Services.Interfaces;
@@ -24,10 +25,7 @@ namespace ChatApi.Services
             try
             {
                 IQueryable<User> users = _db.Users.Where(x => x.Id != userId);
-
-                users = !String.IsNullOrEmpty(model.Name) ? users.Where(x => x.UserName.ToLower().Contains(model.Name)) : users;
-
-                UserPaginateModel result = new(await users.ToListAsync(), new Pager(users.Count(), model.Page, model.PageSize));
+                var result = users.ApplyFilter(model).ReturnPaginated(model.Page);
 
                 return new ResponseModel(200, result);
             }

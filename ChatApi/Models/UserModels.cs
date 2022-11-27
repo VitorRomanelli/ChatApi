@@ -1,5 +1,5 @@
 ﻿using ChatApi.Entities;
-using ChatApi.Helpers;
+using ChatApi.Extensions;
 
 namespace ChatApi.Models
 {
