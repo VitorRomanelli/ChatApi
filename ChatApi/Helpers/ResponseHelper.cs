@@ -7,25 +7,17 @@ namespace ChatApi.Helpers
     {
         public IActionResult CreateResponse(ResponseModel response)
         {
-            switch (response.Status)
+            return response.Status switch
             {
-                case 200:
-                    return Ok(response);
-                case 500:
-                    return StatusCode(500, response);
-                case 422:
-                    return UnprocessableEntity(response);
-                case 409:
-                    return Conflict(response);
-                case 401:
-                    return Unauthorized(response);
-                case 403:
-                    return Forbid(response.Message);
-                case 404:
-                    return NotFound(response);
-                default:
-                    return StatusCode(500, response);
-            }
+                200 => Ok(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
+                500 => StatusCode(500, String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
+                422 => UnprocessableEntity(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
+                409 => Conflict(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
+                401 => Unauthorized(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
+                403 => Forbid(response.Message),
+                404 => NotFound(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
+                _ => null,
+            };
         }
     }
 }
