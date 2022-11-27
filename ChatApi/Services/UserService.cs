@@ -82,8 +82,6 @@ namespace ChatApi.Services
             }
         }
 
-
-
         public async Task<ResponseModel> EditAsync(User user)
         {
             try
@@ -114,8 +112,6 @@ namespace ChatApi.Services
                 return new ResponseModel(500, "Ocorreu um erro!");
             }
         }
-
-
 
         public async Task<ResponseModel> DeleteAsync(string id)
         {
