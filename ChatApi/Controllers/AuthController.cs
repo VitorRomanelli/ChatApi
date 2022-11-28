@@ -1,6 +1,6 @@
-﻿using ChatApi.Entities;
+﻿using ChatApi.Application.Services.Interfaces;
+using ChatApi.Domain.Entities;
 using ChatApi.Helpers;
-using ChatApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApi.Controllers

@@ -1,23 +1,20 @@
-﻿using ChatApi.Models;
+﻿using ChatApi.Application.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApi.Helpers
 {
     public class ResponseHelper : ControllerBase
     {
-        public IActionResult CreateResponse(ResponseModel response)
+        public IActionResult CreateResponse(ResponseModel response) => response.Status switch
         {
-            return response.Status switch
-            {
-                200 => Ok(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
-                500 => StatusCode(500, String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
-                422 => UnprocessableEntity(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
-                409 => Conflict(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
-                401 => Unauthorized(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
-                403 => Forbid(response.Message),
-                404 => NotFound(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
-                _ => null,
-            };
-        }
+            200 => Ok(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
+            500 => StatusCode(500, String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
+            422 => UnprocessableEntity(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
+            409 => Conflict(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
+            401 => Unauthorized(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
+            403 => Forbid(response.Message),
+            404 => NotFound(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
+            _ => null,
+        };
     }
 }

@@ -1,7 +1,7 @@
-﻿using ChatApi.Entities;
+﻿using ChatApi.Application.Models;
+using ChatApi.Application.Services.Interfaces;
+using ChatApi.Domain.Entities;
 using ChatApi.Helpers;
-using ChatApi.Models;
-using ChatApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -22,10 +22,10 @@ namespace ChatApi.Controllers
 
         [HttpPost]
         [Route("paginated")]
+        [Authorize("Bearer")]
         public async Task<IActionResult> GetPaginated(UserFilterModel model)
         {
-            var claimsIdentity = this.User.Identity as ClaimsIdentity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+            string userId = User.FindFirst(ClaimTypes.Authentication).Value;
             return new ResponseHelper().CreateResponse(await _userService.GetPaginated(model, userId));
         }
 

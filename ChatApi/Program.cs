@@ -1,7 +1,7 @@
-﻿using ChatApi.Data;
-using ChatApi.Entities;
-using ChatApi.Services;
-using ChatApi.Services.Interfaces;
+﻿using ChatApi.Application.Services;
+using ChatApi.Application.Services.Interfaces;
+using ChatApi.Domain.Entities;
+using ChatApi.Persistence.Data;
 using ChatApi.WebSocket;
 using ChatApi.WebSocket.Handlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

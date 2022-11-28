@@ -27,4 +27,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ChatApi.Application\ChatApi.Application.csproj" />
+    <ProjectReference Include="..\ChatApi.Domain\ChatApi.Domain.csproj" />
+    <ProjectReference Include="..\ChatApi.Persistence\ChatApi.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>

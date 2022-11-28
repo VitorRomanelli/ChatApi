@@ -1,6 +1,6 @@
-﻿using ChatApi.Entities;
+﻿using ChatApi.Application.Services.Interfaces;
+using ChatApi.Domain.Entities;
 using ChatApi.Helpers;
-using ChatApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,14 +34,14 @@ namespace ChatApi.Controllers
 
         [HttpPost]
         [Route("add")]
-        public async Task<IActionResult> AddAsync(Group group)
+        public async Task<IActionResult> AddAsync(ChatGroup group)
         {
             return new ResponseHelper().CreateResponse(await _groupService.AddAsync(group));
         }
 
         [HttpPost]
         [Route("edit")]
-        public async Task<IActionResult> EditAsync(Group group)
+        public async Task<IActionResult> EditAsync(ChatGroup group)
         {
             return new ResponseHelper().CreateResponse(await _groupService.EditAsync(group));
         }

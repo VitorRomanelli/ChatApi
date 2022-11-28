@@ -1,7 +1,7 @@
 ﻿
+using ChatApi.Application.Models;
+using ChatApi.Application.Services.Interfaces;
 using ChatApi.Helpers;
-using ChatApi.Models;
-using ChatApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
