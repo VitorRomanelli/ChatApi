@@ -1,23 +1,27 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace ChatApi.Persitence.Extensions
+namespace ChatApi.Application.Extensions
 {
     public static class IQueryableExtensions
     {
         public async static Task<PaginatedObject> ReturnPaginated<T>(this IQueryable<T> items, int? currentPage = 1, int pageSize = 10)
         {
+            currentPage = currentPage <= 0 ? 1 : currentPage;
+            pageSize = pageSize <= 0 ? 1 : pageSize;
             Pager pager = new Pager(items.Count(), currentPage, pageSize);
 
-            return new PaginatedObject()
-            {
-                Data = await items.Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToListAsync(),
-                Pager = pager
-            };
+            return new PaginatedObject(data: await items.Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToListAsync(), pager: pager);
         }
     }
 
     public class PaginatedObject
     {
+        public PaginatedObject(object data, Pager pager)
+        {
+            Data = data;
+            Pager = pager;
+        }
+
         public object Data { get; set; }
         public Pager Pager { get; set; }
     }

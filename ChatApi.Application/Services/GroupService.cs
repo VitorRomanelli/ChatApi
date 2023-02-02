@@ -38,7 +38,7 @@ namespace ChatApi.Application.Services
         {
             try
             {
-                var group = await _db.Groups.Include(x => x.Users).FirstOrDefaultAsync(g => g.Users.Select(x => x.UserId).Contains(userId));
+                var group = await _db.Groups.Include(x => x.Users).FirstOrDefaultAsync(g => g.Users!.Select(x => x.UserId).Contains(userId));
 
                 if (group == null)
                 {

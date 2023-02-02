@@ -1,9 +1,11 @@
 ﻿
 using ChatApi.Application.Models;
+using ChatApi.Application.Services;
 using ChatApi.Application.Services.Interfaces;
 using ChatApi.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ChatApi.Controllers
 {
@@ -20,10 +22,38 @@ namespace ChatApi.Controllers
         }
 
         [HttpGet]
-        [Route("health")]
-        public IActionResult Health()
+        [Route("message")]
+        [Authorize("Bearer")]
+        public async Task<IActionResult> GetMessages([FromQuery] Guid chatId, int page)
         {
-            return Ok("healthy");
+            return new ResponseHelper().CreateResponse(await _service.GetUserMessages(chatId, page));
+        }
+
+
+        [HttpGet]
+        [Route("")]
+        [Authorize("Bearer")]
+        public async Task<IActionResult> GetByUserId()
+        {
+            string userId = User.FindFirst(ClaimTypes.Authentication)!.Value;
+            return new ResponseHelper().CreateResponse(await _service.GetUserChats(userId));
+        }
+
+        [HttpPost]
+        [Route("paginated")]
+        [Authorize("Bearer")]
+        public async Task<IActionResult> GetPaginated(ChatFilterModel model)
+        {
+            string userId = User.FindFirst(ClaimTypes.Authentication)!.Value;
+            model.UserId = userId;
+            return new ResponseHelper().CreateResponse(await _service.GetUserPaginatedChats(model));
+        }
+
+        [HttpPost]
+        [Route("add")]
+        public async Task<IActionResult> Add(AddChatModel model)
+        {
+            return new ResponseHelper().CreateResponse(await _service.Add(model));
         }
 
         [HttpPost]

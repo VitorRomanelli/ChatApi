@@ -13,7 +13,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 string security_key = builder.Configuration.GetSection("TokenAuthentication")["SecretKey"];
 var symetricSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(security_key));
 
@@ -37,7 +36,7 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    string connection = Environment.GetEnvironmentVariable("MySqlConnectionString");
+    string connection = Environment.GetEnvironmentVariable("MySqlConnectionString")!;
     builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connection, ServerVersion.AutoDetect(connection)));
 
     builder.Services.AddAuthentication(options =>
@@ -122,10 +121,8 @@ app.UseRouting();
 app.UseAuthorization();
 app.UseCors("CorsPolicy");
 
-app.UseStaticFiles();
-
 app.UseWebSockets(webSocketOptions);
-app.MapWebSocketManager("/ws", app.Services.GetService<RoomHandler>());
+app.MapWebSocketManager("/ws", app.Services.GetService<RoomHandler>()!);
 
 app.UseStaticFiles();
 

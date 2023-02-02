@@ -19,7 +19,10 @@ namespace ChatApi.WebSocket.Handlers
         {
             string message = Encoding.UTF8.GetString(buffer, 0, byteCount);
             var msgObj = JsonConvert.DeserializeObject<SocketMessage>(message);
-            await SendMessageAsync(msgObj.ReceiveId, msgObj.Message);
+            if (msgObj != null)
+            {
+                await SendMessageAsync(msgObj.ReceiveId, msgObj.Message);
+            }
         }
     }
 }

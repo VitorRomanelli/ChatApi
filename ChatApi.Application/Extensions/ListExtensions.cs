@@ -1,4 +1,4 @@
-﻿namespace ChatApi.Persitence.Extensions
+﻿namespace ChatApi.Application.Extensions
 {
     public static class ListExtensions
     {
@@ -6,11 +6,7 @@
         {
             Pager pager = new Pager(items.Count(), currentPage, pageSize);
 
-            return new PaginatedObject()
-            {
-                Data = items.Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList(),
-                Pager = pager
-            };
+            return new PaginatedObject(items.Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList(), pager);
         }
     }
 }

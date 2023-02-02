@@ -58,11 +58,14 @@ namespace ChatApi.WebSocket
             SystemWS.WebSocket socket;
             if (id != null)
             {
-                _sockets.TryRemove(id, out socket);
+                _sockets.TryRemove(id, out socket!);
 
-                await socket.CloseAsync(closeStatus: SystemWS.WebSocketCloseStatus.NormalClosure,
-                                        statusDescription: "Closed by the WebSocketManager",
-                                        cancellationToken: CancellationToken.None);
+                if (socket != null)
+                {
+                    await socket.CloseAsync(closeStatus: SystemWS.WebSocketCloseStatus.NormalClosure,
+                                            statusDescription: "Closed by the WebSocketManager",
+                                            cancellationToken: CancellationToken.None);
+                }
             }
         }
     }

@@ -13,7 +13,6 @@ namespace ChatApi.Domain.Entities
         public string Password { get; set; } = string.Empty;
     
         public List<ChatMessage>? SendedMessages { get; set; }
-        public List<ChatMessage>? ReceivedMessages { get; set; }
         public List<ChatGroupMessage>? GroupMessages { get; set; }
         public List<ChatGroup>? Group { get; set; }
     }

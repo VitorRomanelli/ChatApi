@@ -1,5 +1,7 @@
 ﻿using ChatApi.Application.Models;
+using ChatApi.Application.Models.InputModels;
 using ChatApi.Application.Services.Interfaces;
+using ChatApi.Domain.DTOs;
 using ChatApi.Domain.Entities;
 using ChatApi.Persistence.Data;
 using Microsoft.AspNetCore.Identity;
@@ -45,7 +47,7 @@ namespace ChatApi.Application.Services
             return token;
         }
 
-        public async Task<ResponseModel> LogIn(User user)
+        public async Task<ResponseModel> LogIn(AuthLoginModel user)
         {
             var findUser = await _db.Users.FirstOrDefaultAsync(x => x.UserName == user.UserName);
             if (findUser == null)
@@ -63,7 +65,7 @@ namespace ChatApi.Application.Services
 
             return new ResponseModel(200, new AuthenticateUserDTO(
                 new JwtSecurityTokenHandler().WriteToken(defaultToken),
-                findUser,
+                new UserDTO(findUser),
                 defaultToken.ValidTo,
                 200
             ));

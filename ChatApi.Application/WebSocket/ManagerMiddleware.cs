@@ -56,18 +56,18 @@ namespace ChatApi.WebSocket
 
             while (socket.State == SystemWS.WebSocketState.Open)
             {
-                byte[] messagePayload = null;
+                byte[]? messagePayload = null;
                 int byteCount = 0;
 
                 ArraySegment<Byte> buffer = new ArraySegment<byte>(new Byte[bufferSize]);
 
                 var allBytes = new List<byte>();
-                SystemWS.WebSocketReceiveResult result = null;
+                SystemWS.WebSocketReceiveResult? result = null;
 
                 do
                 {
                     result = await socket.ReceiveAsync(buffer, CancellationToken.None);
-                    allBytes.AddRange(buffer.Array.Take(result.Count));
+                    allBytes.AddRange(buffer.Array!.Take(result.Count));
                     byteCount += result.Count;
                 }
                 while (!result.EndOfMessage);

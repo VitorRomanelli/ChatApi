@@ -1,9 +1,11 @@
 ﻿using ChatApi.Application.Extensions;
+using ChatApi.Application.Helpers;
 using ChatApi.Application.Models;
+using ChatApi.Application.Models.InputModels;
 using ChatApi.Application.Services.Interfaces;
+using ChatApi.Domain.DTOs;
 using ChatApi.Domain.Entities;
 using ChatApi.Persistence.Data;
-using ChatApi.Persitence.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +27,7 @@ namespace ChatApi.Application.Services
             try
             {
                 IQueryable<User> users = _db.Users.Where(x => x.Id != userId);
-                var result = await users.ApplyFilter(model).ReturnPaginated(model.Page);
+                var result = await users.ApplyFilter(model).MapToDTO().ReturnPaginated(model.Page);
 
                 return new ResponseModel(200, result);
             }
@@ -80,11 +82,11 @@ namespace ChatApi.Application.Services
             }
         }
 
-        public async Task<ResponseModel> EditAsync(User user)
+        public async Task<ResponseModel> EditAsync(UserInputModel user)
         {
             try
             {
-                var findUser = await _db.Users.FirstOrDefaultAsync(x => x.UserName == user.UserName);
+                var findUser = await _db.Users.FirstOrDefaultAsync(x => x.Id == user.Id);
 
                 if (findUser == null)
                 {
@@ -94,16 +96,20 @@ namespace ChatApi.Application.Services
                 findUser.Name = user.Name;
                 findUser.Email = user.Email;
                 findUser.Biography = user.Biography;
-                findUser.Pic = user.Pic;
 
-                var result = await _userManager.UpdateAsync(user);
+                if (!String.IsNullOrEmpty(user.Pic) && !user.Pic.Contains("Upload"))
+                {
+                    findUser.Pic = MediaHelper.SaveImage(user.Pic, $"Users/{findUser.Id}", user.PicExtension!, $"pic.{user.PicExtension}");
+                }
+
+                var result = await _userManager.UpdateAsync(findUser);
 
                 if (!result.Succeeded)
                 {
                     return new ResponseModel(500, "Ocorreu um erro ao atualizar o usuário!");
                 }
 
-                return new ResponseModel(200, "Usuário atualizado com sucesso");
+                return new ResponseModel(200, new UserDTO(findUser));
             }
             catch
             {

@@ -1,4 +1,5 @@
 ﻿using ChatApi.Application.Models;
+using ChatApi.Application.Models.InputModels;
 using ChatApi.Application.Services.Interfaces;
 using ChatApi.Domain.Entities;
 using ChatApi.Helpers;
@@ -25,7 +26,7 @@ namespace ChatApi.Controllers
         [Authorize("Bearer")]
         public async Task<IActionResult> GetPaginated(UserFilterModel model)
         {
-            string userId = User.FindFirst(ClaimTypes.Authentication).Value;
+            string userId = User.FindFirst(ClaimTypes.Authentication)!.Value;
             return new ResponseHelper().CreateResponse(await _userService.GetPaginated(model, userId));
         }
 
@@ -44,9 +45,9 @@ namespace ChatApi.Controllers
             return new ResponseHelper().CreateResponse(await _userService.AddAsync(user));
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("edit")]
-        public async Task<IActionResult> EditAsync(User user)
+        public async Task<IActionResult> EditAsync(UserInputModel user)
         {
             return new ResponseHelper().CreateResponse(await _userService.EditAsync(user));
         }

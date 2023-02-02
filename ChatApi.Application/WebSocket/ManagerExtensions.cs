@@ -12,7 +12,7 @@ namespace ChatApi.WebSocket
         {
             services.AddTransient<ConnectionManager>();
 
-            foreach (var type in Assembly.GetEntryAssembly().ExportedTypes)
+            foreach (var type in Assembly.GetEntryAssembly()!.ExportedTypes)
             {
                 if (type.GetTypeInfo().BaseType == typeof(WebSocketHandler))
                 {

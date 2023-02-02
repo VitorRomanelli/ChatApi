@@ -14,7 +14,7 @@ namespace ChatApi.Helpers
             401 => Unauthorized(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
             403 => Forbid(response.Message),
             404 => NotFound(String.IsNullOrEmpty(response.Message) ? response.Content : response.Message),
-            _ => null,
+            _ => StatusCode(400, response.Message),
         };
     }
 }

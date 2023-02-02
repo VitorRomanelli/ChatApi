@@ -1,4 +1,5 @@
-﻿using ChatApi.Application.Services.Interfaces;
+﻿using ChatApi.Application.Models.InputModels;
+using ChatApi.Application.Services.Interfaces;
 using ChatApi.Domain.Entities;
 using ChatApi.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace ChatApi.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> LogIn(User user)
+        public async Task<IActionResult> LogIn(AuthLoginModel user)
         {
             var resp = new ResponseHelper().CreateResponse(await _authService.LogIn(user));
             return resp;
