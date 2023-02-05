@@ -75,7 +75,7 @@ namespace ChatApi.Application.Services
         {
             try
             {
-                var chats = await _db.Chats.ApplyFilter(model).MapToReducedDTO(model.UserId).ReturnPaginated(model.Page);
+                var chats = (await _db.Chats.ApplyFilter(model).Include(x => x.Messages).ToListAsync()).Select(x => new ChatReducedDTO(x.Id, x.RecipientUserId == model.UserId ? x.SenderUser! : x.RecipientUser!, x.Messages!.OrderByDescending(x => x.CreatedAt).FirstOrDefault()!, x.Messages!.Count(x => x.SenderUserId != model.UserId && !x.Visualized)));
                 return new ResponseModel(200, chats);
             }
             catch
