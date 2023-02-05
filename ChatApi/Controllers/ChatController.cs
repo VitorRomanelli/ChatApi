@@ -21,6 +21,14 @@ namespace ChatApi.Controllers
             _service = service;
         }
 
+        [HttpGet]
+        [Route("health")]
+        [AllowAnonymous]
+        public IActionResult Health()
+        {
+            return Ok("healthy");
+        }
+
         [HttpPost]
         [Route("visualize")]
         [Authorize("Bearer")]
