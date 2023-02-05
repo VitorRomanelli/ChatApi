@@ -1,6 +1,7 @@
 ﻿using ChatApi.Application.Extensions;
 using ChatApi.Application.Models;
 using ChatApi.Application.Services.Interfaces;
+using ChatApi.Domain.DTOs;
 using ChatApi.Domain.Entities;
 using ChatApi.Persistence.Data;
 using ChatApi.WebSocket.Handlers;
@@ -8,6 +9,11 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ChatApi.Application.Services
 {
@@ -20,6 +26,36 @@ namespace ChatApi.Application.Services
         {
             _ws = ws;
             _db = db;
+        }
+
+        public async Task<ResponseModel> Visualize(string userId, Guid? chatId)
+        {
+            try
+            {
+               var messages = await _db.Messages.Where(x => x.ChatId == chatId && x.SenderUserId != userId).ToListAsync();
+
+                foreach(var message in messages)
+                {
+                    message.Visualized = true;
+                }
+                  
+                _db.UpdateRange(messages);
+                await _db.SaveChangesAsync();
+                
+                string wsResponse = JsonConvert.SerializeObject(new { chatId = chatId }, new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+
+                await _ws.SendMessageToGroup(userId, wsResponse);
+
+                return new ResponseModel(200, "Mensagens atualizadas");
+            }
+            catch
+            {
+                return new ResponseModel(500, "Ocorreu um erro!");
+            }
         }
 
         public async Task<ResponseModel> GetUserChats(string userId)
@@ -52,7 +88,7 @@ namespace ChatApi.Application.Services
         {
             try
             {
-                var messages = await _db.Messages.ApplyFilter(chatId).ReturnPaginated(page);
+                var messages = await _db.Messages.OrderByDescending(x => x.CreatedAt).ApplyFilter(chatId).ReturnPaginated(page);
                 return new ResponseModel(200, messages);
             }
             catch
@@ -65,7 +101,7 @@ namespace ChatApi.Application.Services
         {
             try
             {
-                Chat? chat = await _db.Chats.FirstOrDefaultAsync(x => (x.SenderUserId == model.SenderUserId && model.RecipientUserId == model.RecipientUserId) || (x.SenderUserId == model.RecipientUserId && model.RecipientUserId == model.SenderUserId));
+                Chat? chat = await _db.Chats.FirstOrDefaultAsync(x => (x.SenderUserId == model.SenderUserId && x.RecipientUserId == model.RecipientUserId) || (x.SenderUserId == model.RecipientUserId && x.RecipientUserId == model.SenderUserId));
 
                 if(chat != null)
                 {
@@ -81,7 +117,16 @@ namespace ChatApi.Application.Services
                 await _db.SaveChangesAsync();
 
                 chat = result.Entity;
-                
+
+                var senderUser = await _db.Users.FirstOrDefaultAsync(x => x.Id == model.SenderUserId);
+
+                string wsResponse = JsonConvert.SerializeObject(new { chatId = chat.Id, chat = new ChatReducedDTO(chat.Id, senderUser!, null), isAdding = true }, new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+
+                await _ws.SendMessageToGroup(model.RecipientUserId, wsResponse);
                 return ResponseModel.BuildOkResponse("Operação realizada com sucesso!", new { chatId = chat.Id });
             }
             catch
@@ -150,10 +195,13 @@ namespace ChatApi.Application.Services
                     await _db.AddAsync(message);
                     await _db.SaveChangesAsync();
 
-                    string wsResponse = JsonConvert.SerializeObject(new SendMessageSocketModel() { Message = message, MessageId = message.Id }, new JsonSerializerSettings
+
+                    string wsResponse = System.Text.Json.JsonSerializer.Serialize(new SendMessageSocketModel() { Message = message, MessageId = message.Id }, new JsonSerializerOptions
                     {
-                        ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
+                        WriteIndented = true
                     });
 
                     await _ws.SendMessageToGroup(chat.Id.ToString(), wsResponse);

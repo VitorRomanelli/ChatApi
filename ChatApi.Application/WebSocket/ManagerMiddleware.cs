@@ -24,10 +24,10 @@ namespace ChatApi.WebSocket
 
             var userId = context.Request.Query["userId"].ToString();
 
-            if (!String.IsNullOrEmpty(context.Request.Query["roomId"]))
+            if (!String.IsNullOrEmpty(context.Request.Query["chatId"]))
             {
-                var roomId = context.Request.Query["roomId"].ToString();
-                await _Handler.OnConnectedGroup(socket, userId + roomId, roomId);
+                var chatId = context.Request.Query["chatId"].ToString();
+                await _Handler.OnConnectedGroup(socket, userId + chatId, chatId);
             }
             else
             {

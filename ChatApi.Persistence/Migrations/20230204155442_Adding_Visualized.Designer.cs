@@ -3,6 +3,7 @@ using System;
 using ChatApi.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatApi.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230204155442_Adding_Visualized")]
+    partial class Adding_Visualized
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -131,7 +133,10 @@ namespace ChatApi.Persistence.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Visualized")
+                    b.Property<bool>("VisualizedRecipient")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("VisualizedSender")
                         .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");

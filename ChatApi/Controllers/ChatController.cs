@@ -21,6 +21,15 @@ namespace ChatApi.Controllers
             _service = service;
         }
 
+        [HttpPost]
+        [Route("visualize")]
+        [Authorize("Bearer")]
+        public async Task<IActionResult> Visualize([FromQuery] Guid chatId, string userId)
+        {
+            return new ResponseHelper().CreateResponse(await _service.Visualize(userId, chatId));
+        }
+
+
         [HttpGet]
         [Route("message")]
         [Authorize("Bearer")]

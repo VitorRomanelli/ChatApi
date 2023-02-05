@@ -16,10 +16,10 @@ namespace ChatApi.WebSocket.Handlers
             await Task.Run(() => ConnectionManager.AddSocket(socket, userId));
         }
 
-        public virtual async Task OnConnectedGroup(SystemWS.WebSocket socket, string socketId, string boardId)
+        public virtual async Task OnConnectedGroup(SystemWS.WebSocket socket, string socketId, string chatId)
         {
             await Task.Run(() => ConnectionManager.AddSocket(socket, socketId));
-            await Task.Run(() => ConnectionManager.AddToGroup(socket, boardId));
+            await Task.Run(() => ConnectionManager.AddToGroup(socket, chatId));
         }
 
         public virtual async Task OnDisconnected(SystemWS.WebSocket socket)
@@ -55,8 +55,6 @@ namespace ChatApi.WebSocket.Handlers
         public async Task SendMessageToGroup(string groupId, string message)
         {
             List<SystemWS.WebSocket> sockets = ConnectionManager.GetSocketGroup(groupId);
-
-
             foreach (var socket in sockets)
             {
                 if (socket.State != SystemWS.WebSocketState.Closed)
@@ -65,8 +63,6 @@ namespace ChatApi.WebSocket.Handlers
                 }
             }
         }
-
-
 
         public async Task SendMessageToAllAsync(string message)
         {
@@ -78,6 +74,5 @@ namespace ChatApi.WebSocket.Handlers
         }
 
         public abstract Task ReceiveAsync(SystemWS.WebSocket socket, SystemWS.WebSocketReceiveResult result, int byteCount, byte[] buffer);
-
     }
 }

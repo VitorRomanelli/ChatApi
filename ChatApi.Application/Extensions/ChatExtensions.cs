@@ -22,7 +22,7 @@ namespace ChatApi.Application.Extensions
 
         public static IQueryable<ChatReducedDTO> MapToReducedDTO(this IQueryable<Chat> items, string userId)
         {
-            return items.Include(x => x.SenderUser).Include(x => x.RecipientUser).Select(x => new ChatReducedDTO(x.Id, x.RecipientUserId == userId ? x.SenderUser! : x.RecipientUser!));
+            return items.Include(x => x.SenderUser).Include(x => x.RecipientUser).Include(x => x.Messages).Select(x => new ChatReducedDTO(x.Id, x.RecipientUserId == userId ? x.SenderUser! : x.RecipientUser!, x.Messages!.OrderByDescending(x => x.CreatedAt).FirstOrDefault()!, x.Messages!.Count(x => x.SenderUserId != userId && !x.Visualized)));
         }
     }
 }
