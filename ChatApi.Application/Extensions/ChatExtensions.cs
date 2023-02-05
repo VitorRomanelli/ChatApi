@@ -14,7 +14,7 @@ namespace ChatApi.Application.Extensions
     {
         public static IQueryable<Chat> ApplyFilter(this IQueryable<Chat> items, ChatFilterModel model)
         {
-            items = items.AsNoTracking().Include(x => x.RecipientUser).Include(x => x.SenderUser);
+            items = items.AsNoTracking().Include(x => x.RecipientUser).Include(x => x.SenderUser).Include(x => x.Messages);
             items = !String.IsNullOrEmpty(model.Name) ? items.Where(x => x.RecipientUser!.Name.ToLower().Contains(model.Name) || x.SenderUser!.Name.ToLower().Contains(model.Name)) : items;
             items = !String.IsNullOrEmpty(model.UserId) ? items.Where(x => x.SenderUserId == model.UserId || x.RecipientUserId == model.UserId) : items;
             return items;

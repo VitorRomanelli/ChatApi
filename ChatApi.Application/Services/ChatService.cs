@@ -32,16 +32,16 @@ namespace ChatApi.Application.Services
         {
             try
             {
-               var messages = await _db.Messages.Where(x => x.ChatId == chatId && x.SenderUserId != userId).ToListAsync();
+                var messages = await _db.Messages.Where(x => x.ChatId == chatId && x.SenderUserId != userId).ToListAsync();
 
-                foreach(var message in messages)
+                foreach (var message in messages)
                 {
                     message.Visualized = true;
                 }
-                  
+
                 _db.UpdateRange(messages);
                 await _db.SaveChangesAsync();
-                
+
                 string wsResponse = JsonConvert.SerializeObject(new { chatId = chatId }, new JsonSerializerSettings
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver(),
@@ -75,8 +75,10 @@ namespace ChatApi.Application.Services
         {
             try
             {
-                var chats = (await _db.Chats.ApplyFilter(model).Include(x => x.Messages).ToListAsync()).Select(x => new ChatReducedDTO(x.Id, x.RecipientUserId == model.UserId ? x.SenderUser! : x.RecipientUser!, x.Messages!.OrderByDescending(x => x.CreatedAt).FirstOrDefault()!, x.Messages!.Count(x => x.SenderUserId != model.UserId && !x.Visualized)));
-                return new ResponseModel(200, chats);
+                var chats = await _db.Chats.ApplyFilter(model).ToListAsync();
+
+                var result = chats.Select(x => new ChatReducedDTO(x.Id, x.RecipientUserId == model.UserId ? x.SenderUser! : x.RecipientUser!, x.Messages!.OrderByDescending(x => x.CreatedAt).FirstOrDefault()!, x.Messages!.Count(x => x.SenderUserId != model.UserId && !x.Visualized))).ToList();
+                return new ResponseModel(200, result);
             }
             catch
             {
@@ -103,7 +105,7 @@ namespace ChatApi.Application.Services
             {
                 Chat? chat = await _db.Chats.FirstOrDefaultAsync(x => (x.SenderUserId == model.SenderUserId && x.RecipientUserId == model.RecipientUserId) || (x.SenderUserId == model.RecipientUserId && x.RecipientUserId == model.SenderUserId));
 
-                if(chat != null)
+                if (chat != null)
                 {
                     return ResponseModel.BuildOkResponse("Operação realizada com sucesso!", new { chatId = chat.Id });
                 }
@@ -113,7 +115,7 @@ namespace ChatApi.Application.Services
                     SenderUserId = model.SenderUserId,
                     RecipientUserId = model.RecipientUserId,
                 });
-                
+
                 await _db.SaveChangesAsync();
 
                 chat = result.Entity;
@@ -139,7 +141,7 @@ namespace ChatApi.Application.Services
         {
             try
             {
-                if(model.IsToGroup && model.GroupId == null)
+                if (model.IsToGroup && model.GroupId == null)
                 {
                     return new ResponseModel(404, "Grupo não encontrado!");
                 }
@@ -153,7 +155,7 @@ namespace ChatApi.Application.Services
                         return ResponseModel.BuildNotFoundResponse("Grupo não encontrado");
                     }
 
-                    ChatGroupMessage groupMessage = new() 
+                    ChatGroupMessage groupMessage = new()
                     {
                         GroupId = group.Id,
                         Content = model.Message,
@@ -169,7 +171,7 @@ namespace ChatApi.Application.Services
                         ContractResolver = new CamelCasePropertyNamesContractResolver(),
                         ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                     });
-                    
+
                     await _ws.SendMessageToGroup(group.Id.ToString(), wsResponse);
                     await _ws.SendMessageToGroup(model.RecipientUserId, wsResponse);
 
