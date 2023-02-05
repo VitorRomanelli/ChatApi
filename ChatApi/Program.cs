@@ -16,42 +16,22 @@ var builder = WebApplication.CreateBuilder(args);
 string security_key = builder.Configuration.GetSection("TokenAuthentication")["SecretKey"];
 var symetricSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(security_key));
 
-if (builder.Environment.IsDevelopment())
-{
-    string connection = builder.Configuration.GetConnectionString("localMySqlConnection");
-    builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connection, ServerVersion.AutoDetect(connection)));
+string connection = builder.Configuration.GetConnectionString("localMySqlConnection");
+builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connection, ServerVersion.AutoDetect(connection)));
 
-    builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    }).AddJwtBearer(options =>
-    {
-        options.SaveToken = true;
-        options.TokenValidationParameters.ValidateIssuerSigningKey = true;
-        options.TokenValidationParameters.IssuerSigningKey = symetricSecurityKey;
-        options.TokenValidationParameters.ValidAudience = builder.Configuration.GetSection("TokenAuthentication")["Audience"];
-        options.TokenValidationParameters.ValidIssuer = builder.Configuration.GetSection("TokenAuthentication")["Issuer"];
-        options.TokenValidationParameters.ClockSkew = TimeSpan.Zero;
-    });
-}
-else
+builder.Services.AddAuthentication(options =>
 {
-    string connection = Environment.GetEnvironmentVariable("MySqlConnectionString")!;
-    builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connection, ServerVersion.AutoDetect(connection)));
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.SaveToken = true;
+    options.TokenValidationParameters.ValidateIssuerSigningKey = true;
+    options.TokenValidationParameters.IssuerSigningKey = symetricSecurityKey;
+    options.TokenValidationParameters.ValidAudience = builder.Configuration.GetSection("TokenAuthentication")["Audience"];
+    options.TokenValidationParameters.ValidIssuer = builder.Configuration.GetSection("TokenAuthentication")["Issuer"];
+    options.TokenValidationParameters.ClockSkew = TimeSpan.Zero;
+});
 
-    builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    }).AddJwtBearer(options =>
-    {
-        options.SaveToken = true;
-        options.TokenValidationParameters.ValidateIssuerSigningKey = true;
-        options.TokenValidationParameters.IssuerSigningKey = symetricSecurityKey;
-        options.TokenValidationParameters.ValidAudience = builder.Configuration.GetSection("TokenAuthentication")["Audience"];
-        options.TokenValidationParameters.ValidIssuer = builder.Configuration.GetSection("TokenAuthentication")["Issuer"];
-        options.TokenValidationParameters.ClockSkew = TimeSpan.Zero;
-    });
-}
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder => builder
